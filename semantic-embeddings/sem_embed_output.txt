@@ -1,0 +1,89 @@
+(env) 20CS30043@gpusrv-xeon-75:~/iit/IR/semantic_embed/IR-project/semantic-embeddings$ make sem_embed
+export TF_CPP_MIN_LOG_LEVEL=2
+python3 learn_image_embeddings.py --dataset CIFAR-10 --data_root ./cifar-10-batches-py --embedding embeddings/cifar10.unitsphere.pickle --architecture simple --max_decay 0.1 --epochs 5 --model_dump cifar10-embedding.model.h5 --feature_dump cifar10-features.pickle
+Using TensorFlow backend.
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:519: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint8 = np.dtype([("qint8", np.int8, 1)])
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:520: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint8 = np.dtype([("quint8", np.uint8, 1)])
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:521: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint16 = np.dtype([("qint16", np.int16, 1)])
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:522: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint16 = np.dtype([("quint16", np.uint16, 1)])
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:523: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint32 = np.dtype([("qint32", np.int32, 1)])
+/home/du0/20CS30043/miniconda3/envs/env/lib/python3.6/site-packages/tensorflow/python/framework/dtypes.py:528: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  np_resource = np.dtype([("resource", np.ubyte, 1)])
+2023-03-12 17:12:11.790451: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv1_input (InputLayer)     (None, None, None, 3)     0         
+_________________________________________________________________
+conv1 (Conv2D)               (None, None, None, 64)    1792      
+_________________________________________________________________
+bn1 (BatchNormalization)     (None, None, None, 64)    256       
+_________________________________________________________________
+conv2 (Conv2D)               (None, None, None, 64)    36928     
+_________________________________________________________________
+bn2 (BatchNormalization)     (None, None, None, 64)    256       
+_________________________________________________________________
+ap3 (AveragePooling2D)       (None, None, None, 64)    0         
+_________________________________________________________________
+conv4 (Conv2D)               (None, None, None, 128)   73856     
+_________________________________________________________________
+bn4 (BatchNormalization)     (None, None, None, 128)   512       
+_________________________________________________________________
+conv5 (Conv2D)               (None, None, None, 128)   147584    
+_________________________________________________________________
+bn5 (BatchNormalization)     (None, None, None, 128)   512       
+_________________________________________________________________
+conv6 (Conv2D)               (None, None, None, 128)   147584    
+_________________________________________________________________
+bn6 (BatchNormalization)     (None, None, None, 128)   512       
+_________________________________________________________________
+ap7 (AveragePooling2D)       (None, None, None, 128)   0         
+_________________________________________________________________
+conv8 (Conv2D)               (None, None, None, 256)   295168    
+_________________________________________________________________
+bn8 (BatchNormalization)     (None, None, None, 256)   1024      
+_________________________________________________________________
+conv9 (Conv2D)               (None, None, None, 256)   590080    
+_________________________________________________________________
+bn9 (BatchNormalization)     (None, None, None, 256)   1024      
+_________________________________________________________________
+conv10 (Conv2D)              (None, None, None, 256)   590080    
+_________________________________________________________________
+bn10 (BatchNormalization)    (None, None, None, 256)   1024      
+_________________________________________________________________
+ap11 (AveragePooling2D)      (None, None, None, 256)   0         
+_________________________________________________________________
+conv12 (Conv2D)              (None, None, None, 512)   1180160   
+_________________________________________________________________
+bn12 (BatchNormalization)    (None, None, None, 512)   2048      
+_________________________________________________________________
+avg_pool (GlobalAveragePooli (None, 512)               0         
+_________________________________________________________________
+fc14 (Dense)                 (None, 512)               262656    
+_________________________________________________________________
+bn14 (BatchNormalization)    (None, 512)               2048      
+_________________________________________________________________
+embedding (Dense)            (None, 100)               51300     
+_________________________________________________________________
+l2norm (Lambda)              (None, 100)               0         
+=================================================================
+Total params: 3,386,404
+Trainable params: 3,381,796
+Non-trainable params: 4,608
+_________________________________________________________________
+Epoch 1/5
+500/500 [==============================] - 782s 2s/step - loss: 1.1536 - max_sim_acc: 0.3681 - val_loss: 0.9213 - val_max_sim_acc: 0.4531
+Epoch 2/5
+500/500 [==============================] - 782s 2s/step - loss: 0.8283 - max_sim_acc: 0.5110 - val_loss: 0.7445 - val_max_sim_acc: 0.5299
+Epoch 3/5
+500/500 [==============================] - 784s 2s/step - loss: 0.6860 - max_sim_acc: 0.6003 - val_loss: 0.6191 - val_max_sim_acc: 0.6434
+Epoch 4/5
+500/500 [==============================] - 786s 2s/step - loss: 0.5995 - max_sim_acc: 0.6621 - val_loss: 0.5625 - val_max_sim_acc: 0.6813
+Epoch 5/5
+500/500 [==============================] - 785s 2s/step - loss: 0.5425 - max_sim_acc: 0.7100 - val_loss: 0.5141 - val_max_sim_acc: 0.7241
+[0.5140801265835762, 0.7241000014543534]
