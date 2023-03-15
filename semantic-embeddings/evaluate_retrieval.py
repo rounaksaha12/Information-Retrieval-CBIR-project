@@ -1,5 +1,6 @@
 import numpy as np
 import numexpr as ne
+import time
 
 import argparse, pickle, os.path
 from collections import OrderedDict
@@ -54,6 +55,8 @@ def pairwise_retrieval(features, normalize = False, return_generator = True):
         ind2id = None
     
     # Compute pairwise distances
+    num_queries = features.shape[0]
+    start = time.perf_counter()
     if normalize:
         features /= np.linalg.norm(features, axis = -1, keepdims = True)
         pdist = -np.dot(features, features.T)
@@ -65,18 +68,23 @@ def pairwise_retrieval(features, normalize = False, return_generator = True):
     
     # Rank images
     ranking = np.argsort(pdist, axis = -1)
+    end = time.perf_counter()
+    print("Total retrieval time:",(end-start)*10**3,"ms for",num_queries,"images")
+    print("Average query retrieval time:", ((end-start)*10**3)/num_queries, "s")
     del pdist
+
     if ind2id is not None:
         gen = ((ind2id[i], ind2id[ret].tolist()) for i, ret in enumerate(ranking))
     else:
         gen = ((i, ret.tolist()) for i, ret in enumerate(ranking))
+
     return gen if return_generator else dict(gen)
 
 
 def print_performance(perf, metrics = METRICS):
     
     print()
-    
+
     # Print header
     max_name_len = max(len(lbl) for lbl in perf.keys())
     print(' | '.join([' ' * max_name_len] + ['{:^6s}'.format(metric) for metric in metrics]))
@@ -202,7 +210,7 @@ if __name__ == '__main__':
         METRICS[4] = 'AHP@250 (WUP)'
         METRICS[9] = 'AHP@250 (LCS_HEIGHT)'
     print_performance(perf)
-    if args.csv:
-        write_performance(perf, args.csv, args.prec_type)
-    if args.plot_max > 0:
-        plot_performance(perf, args.plot_max, args.prec_type, args.clip_ahp)
+    # if args.csv:
+    #     write_performance(perf, args.csv, args.prec_type)
+    # if args.plot_max > 0:
+    #     plot_performance(perf, args.plot_max, args.prec_type, args.clip_ahp)
