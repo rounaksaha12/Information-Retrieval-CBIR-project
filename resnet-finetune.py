@@ -175,8 +175,8 @@ if __name__ == '__main__':
 
 	model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
 
-	PATH = f'./cifar-resnet-{'finetune' if args.finetune else 'ft'}-CIFAR10'
-	torch.save(model_ft.state_dict(),PATH)
+	# PATH = f'./cifar-resnet-{'finetune' if args.finetune else 'ft'}-CIFAR10'
+	# torch.save(model_ft.state_dict(),PATH)
 
 	print('--end--')
 	print()
