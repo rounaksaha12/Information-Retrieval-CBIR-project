@@ -1,3 +1,0 @@
-$ conda create --name <environment_name> python=3.9
-$ conda activate <environment_name>
-$ pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
