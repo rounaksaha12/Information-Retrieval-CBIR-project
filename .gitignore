@@ -45,7 +45,7 @@ __pycache__/**
 embeddings/**
 data/**
 log_files/**
-backup/log_files/**
+backup/**
 !log_files/log_descriptions.log
 !log_files/log_files.zip
 models/**
