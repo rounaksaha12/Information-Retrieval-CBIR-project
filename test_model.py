@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from datetime import datetime
 import time
-import modelNew
+import src.modelNew as modelNew
 import trainNew
 import pickle
 import argparse

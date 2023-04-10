@@ -5,7 +5,7 @@ import torchvision
 from torchvision import datasets, models, transforms
 
 import pickle
-from modelNew import *
+from src.modelNew import *
 import numpy as np
 import matplotlib.pyplot as plt 
 import argparse
