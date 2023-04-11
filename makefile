@@ -10,7 +10,9 @@ EMBED_100_DUMP=embeddings_100
 HASH_DUMP=hashes
 IDMAP_DUMP=id2imgs
 CLASS_EMBED=./cifar100.unitsphere.pickle
-K=20
+K=250
+TYPE=train
+EMBED_TYPE=test
 
 # still have to activate the environment before running this command
 finetune:	
@@ -23,4 +25,9 @@ run_alexnet:
 	python3 trainNew.py --epochs 1 | tee -a out-alexnet-cifar10-transfer-learn.log
 
 run_test:
-	python3 test_model.py --k ${K} | tee retrieval_metrics_calc.log
+	python3 test_model.py --k ${K} --dataset ${TYPE} | tee retrieval_metrics_calc.log
+
+get_embeddings:
+	python3 get_embeddings.py --dataset ${EMBED_TYPE}
+
+
