@@ -11,7 +11,7 @@ HASH_DUMP=hashes
 IDMAP_DUMP=id2imgs
 CLASS_EMBED=./cifar100.unitsphere.pickle
 K=250
-TYPE=train
+TYPE=test
 EMBED_TYPE=test
 
 # still have to activate the environment before running this command

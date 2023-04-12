@@ -23,7 +23,8 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser()
         parser.add_argument('--k', default=20, type=int,
                             help='Number of top similar images to retrieve')
-        parser.add_argument('--dataset',default='train',type=str,help="If 'train',retrieves images from training set of CIFAR-100 ,else if 'test' testing set of CIFAR-100")
+        parser.add_argument('--dataset', default='train', type=str,
+                            help="If 'train',retrieves images from training set of CIFAR-100 ,else if 'test' testing set of CIFAR-100")
         args = parser.parse_args()
 
         topk = args.k
@@ -38,10 +39,10 @@ if __name__ == '__main__':
 
         mhp1_1, mhp1_5, mhp1_10, mhp1_15, mhp1_k = [0.0, 0.0, 0.0, 0.0, 0.0]
         mhp2_1, mhp2_5, mhp2_10, mhp2_15, mhp2_k = [0.0, 0.0, 0.0, 0.0, 0.0]
-        
+
         mbal_acc_1 = 0.0
         mbal_acc_2 = 0.0
-        
+
         if type == 'train':
             with open('embeddings/train/id2imgs_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_lables = pickle.load(f)
@@ -51,8 +52,6 @@ if __name__ == '__main__':
             img_dataset_hashes = torch.from_numpy(img_dataset_hashes)
             img_dataset_hashes = torch.where(img_dataset_hashes >= 0.5, torch.ones_like(
                 img_dataset_hashes), torch.zeros_like(img_dataset_hashes))
-
-            # F.normalize(img_dataset_hashes, p=2, dim=1, out=img_dataset_hashes)
 
             with open('embeddings/train/id2imgs_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_labels = pickle.load(f)
@@ -70,19 +69,17 @@ if __name__ == '__main__':
             img_dataset_embed_4096 = torch.from_numpy(img_dataset_embed_4096)
             F.normalize(img_dataset_embed_4096, p=2,
                         dim=1, out=img_dataset_embed_4096)
-            
+
         elif type == 'test':
             with open('embeddings/test/id2imgs_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_lables = pickle.load(f)
             with open('embeddings/test/hashes_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_hashes = pickle.load(f)
-            print(img_dataset_hashes)
 
-            img_dataset_hashes = torch.from_numpy(img_dataset_hashes)
+            img_dataset_hashes = torch.from_numpy(
+                np.vstack(img_dataset_hashes))
             img_dataset_hashes = torch.where(img_dataset_hashes >= 0.5, torch.ones_like(
                 img_dataset_hashes), torch.zeros_like(img_dataset_hashes))
-
-            # F.normalize(img_dataset_hashes, p=2, dim=1, out=img_dataset_hashes)
 
             with open('embeddings/test/id2imgs_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_labels = pickle.load(f)
@@ -90,14 +87,16 @@ if __name__ == '__main__':
             with open('embeddings/test/embeddings_100_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_embed_100 = pickle.load(f)
 
-            img_dataset_embed_100 = torch.from_numpy(img_dataset_embed_100)
+            img_dataset_embed_100 = torch.from_numpy(
+                np.vstack(img_dataset_embed_100))
             F.normalize(img_dataset_embed_100, p=2,
                         dim=1, out=img_dataset_embed_100)
 
             with open('embeddings/test/embeddings_4096_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_embed_4096 = pickle.load(f)
 
-            img_dataset_embed_4096 = torch.from_numpy(img_dataset_embed_4096)
+            img_dataset_embed_4096 = torch.from_numpy(
+                np.vstack(img_dataset_embed_4096))
             F.normalize(img_dataset_embed_4096, p=2,
                         dim=1, out=img_dataset_embed_4096)
 
@@ -125,8 +124,8 @@ if __name__ == '__main__':
                 download=True,
                 transform=data_transform
             )}
-        
-        # construct a class similar 2-d matrix of size 100*100 where i,j the entry 
+
+        # construct a class similar 2-d matrix of size 100*100 where i,j the entry
         # contains the similarity of ith and jth class
         class_sim_matrix = np.zeros((100, 100))
         for i in range(100):
@@ -134,9 +133,12 @@ if __name__ == '__main__':
                 x = class_embeds['embedding'][i]
                 y = class_embeds['embedding'][j]
                 class_sim_matrix[i][j] = cosine_similarity(
-                x.reshape(1, -1), y.reshape(1, -1))
-                
-        
+                    x.reshape(1, -1), y.reshape(1, -1))
+
+        # sort each row of list in place
+        class_sim_matrix = np.sort(
+            class_sim_matrix, axis=1, kind='mergesort')[:, ::-1]
+        # print(class_sim_matrix)
 
         cnt = 0
         for img, label in image_datasets["test"]:
@@ -157,14 +159,14 @@ if __name__ == '__main__':
 
             print(f'\nModel inference and pre-process time : {end-start}')
             avg_inference_time += (end-start)
-            retrieved_labels_1,retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
-               img, embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels,ds_label,label, topk)
-          
+            retrieved_labels_1, retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
+                img, embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label, label, topk)
+
             p1_array, hp1_array, bal_acc_1 = evaluate_retrieval(
-                label,class_sim_matrix, retrieved_labels=retrieved_labels_1, img_dataset_labels = img_dataset_labels,k_list=[1, 5, 10, 15, topk])
-            p2_array, hp2_array,bal_acc_2 = evaluate_retrieval(
-                label,class_sim_matrix, retrieved_labels=retrieved_labels_2, img_dataset_labels = img_dataset_labels,k_list=[1, 5, 10, 15, topk])
-            # print('here')
+                label, class_sim_matrix, retrieved_labels=retrieved_labels_1, k_list=[1, 5, 10, 15, topk])
+            p2_array, hp2_array, bal_acc_2 = evaluate_retrieval(
+                label, class_sim_matrix, retrieved_labels=retrieved_labels_2, k_list=[1, 5, 10, 15, topk])
+
             map1_1 += p1_array[0]
             map1_5 += p1_array[1]
             map1_10 += p1_array[2]
@@ -238,7 +240,5 @@ if __name__ == '__main__':
                     f"\nAverage time taken to find top {topk} images by method 1 : {avg_similarity_time_1/(cnt+1)}")
                 print(
                     f"\nAverage time taken to find top {topk} images by method 2 : {avg_similarity_time_2/(cnt+1)}")
-                
-                # print(f"Balanced classification accuracy by method 1 of {topk} retrieved images : {mbal_acc_1/(cnt+1)}")
-                # print(f"Balanced classification accuracy by method 2 of {topk} retrieved images : {mbal_acc_2/(cnt+1)}")
+
             cnt += 1
