@@ -16,7 +16,7 @@ import argparse
 from evaluate_retrieval import evaluate_retrieval
 
 
-def retrieve_images(img, embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label=None, label=None, topk=20):
+def retrieve_images(embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label=None, label=None, topk=20):
 
     with torch.no_grad():
         if label is not None:
