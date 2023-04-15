@@ -1,114 +1,81 @@
-# Content-Based Image Retrieval Based On a Word Associations Network
+# Content-Based Image Retrieval using Binary Hashes
 
-This repository contains the implementation of semantical similarity between images based a word assications network as described in the following paper:
+This repository contains the implementation of **Algorithm 2** and **Algorithm 2 + hashes**.  
 
-> [**Semantic Similarity Between Images: A Novel Approach Based on a Complex Network of Free Word Associations**][1]  
-> Enrico Palumbo - Physics University of Torino, via Giuria, 1, 10025 Torino, Italy [enrico.palumbo@edu.unito.it](mailto:enrico.palumbo@edu.unito.it)<br>
-> Walter Allasia - EURIX, via Carcano, 26, 10153 Torino, Italy [allasia@eurix.it](mailto:allasia@eurix.it)<br>
+**Algorithm 2** is retrieval using the multiplication of 100-dimensional embeddings of corpus images and query image [ matrix multiplication with a vector ] and retrieving the *top k* images.  
 
-The data for word assocations is taken from the follwing site:
+**Algorithm 2 + hashes** is shortlisting *top 2k* images using *hashes* followed by performing Algorithm 2 on the shortlisted pool of images.  
 
-> [**University of South Florida Free Association Norms**][2]  
-> Douglas L. Nelson and Cathy L. McEvoy - University of South Florida<br>
-> Thomas A. Schreiber - University of Kansas<br>
+The details of both the algorithms are described in the **Report**.  
 
-If you use this code, please cite the above resources.
+The training and testing was carried out using the [**The CIFAR-100 dataset**][1] :
 
-The rest of the repository deals with Content-Based Image Retrieval (CBIR) on the CIFAR-100 dataset. Additionally, other insights have been derived from the Word Associations Network.
+## 0. Setup
+
+After cloning this repository,create **embeddings** and **models** folder, download the **embeddings** and **models** folder from [**here**][2], and extract their contents into the **embeddings** and **models** folder in the directory respectively.
 
 ## 1. Quickrun
+
+Before running any scripts ensure that you have the required dependencies. To install the dependencies, use:
+
+```text
+    virtualenv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+```
 
 ### 1.1. All Test Results
 
 For computing the test results for all 10000 test images in the CIFAR-100 dataset, use:
 
-```
-    python ./compute_test_results.py
-    python ./compute_retrieval_performance.py --all
-```
-
-### 1.2. Partial Test Results
-
-For computing the test results for a given number of test images in the CIFAR-100 dataset, use:
-```
-    python ./compute_partial_test_results.py  <number of images to be tested>
-    python ./compute_retrieval_performance.py --partial
+```python
+    python test_model.py \
+    --k <value of top k> \
+    --dataset <test/train >
 ```
 
-### 1.3. Interactive Demo
+The dataset argument can be used to specify whether to retrieve from **test/train** images of the **CIFAR-100** dataset. The results include the performance metrics obtained and the predictions of *top k* images along with similarity scores both by **Algorithm 2** and **Algorithm 2 +  hashes**. A graph named 'plot.png' is created displaying variation of mAP and mAHP versus k.
+<!-- 
+### 1.2. Interactive Demo
 
 For an interactive demo, use:
-```
-    python ./interactive_demo.py
-```
+
+```python
+    python interface.py
+``` -->
 
 ## 2. Longrun
-### 2.1. Compute Image-Word Associations
-Every 32x32 image in the CIFAR-100 train dataset is cubic-interpolated to 224x224. The interpolated image is passed through the ResNet-50 model. The top 10 predictions of model along with its fine label and coarse label as provided by the dataset itself are saved in `Base Associations`.
-```
-    bash ./compute_base_associations.sh
+
+Before running any scripts ensure that you have the required dependencies. To install the dependencies, use:
+
+```text
+    virtualenv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 ```
 
-### 2.2. Compute Words
-A PostgreSQL database is to be setup named `word_associations`. This database will contain only a single relation named `usf_word_associations`. The relation will have fields `id`, `cue`, `target`, `strength`. Enter the records in the `Word Associations/usf_word_associations.csv` into this relation. The relevant connection parameters are the put inside the `conn` function of `compute_words.py`. We associate every image in the CIFAR-100 train dataset to `topIWK` words, each of which is in turn associated with `topWWK` words. The set of all such words are make up the words of the Word Associations Network. Data generated is saved in `word_links.py`. A text file `Word/all_words.txt` containing a list of all the words with ids is also generated.
-```
-    python compute_words.py
+### 2.1. Train Model
+
+
+### 2.2. Compute Image Embeddings
+
+To compute the image embeddings of the <test/train> images of the CIFAR-100 dataset, use:
+
+```python
+    python get_embeddings.py --dataset <test/train>    
 ```
 
-### 2.3. Compute Image-Word Links
-The related `topIWK` words are to be saved as ids for each of the CIFAR-100 training images. Data generated is saved in `image_links.pickle`.
-```
-    python compute_image_links.py
-```
-
-### 2.4. Compute Word-Word Links
-For the set of all the words in the Word Associations Network, we determine the pairwise link strengths by querying the database created in step 2.2 and save the data in `word_links.pickle`. It should the ensured that the proper connection parameters are put inside the `conn` function of `compute_word_links.py`. 
-```
-    python compute_word_links.py
-```
-
-### 2.5. Run the Model on The Test Dataset
-The model is run on the CIFAR-100 test dataset. For every test image, the `topK` related images in the CIFAR-100 train dataset which are semantically similar to it are predicted. The predictions are saved in `test_results.pickle`. 
-```
-    python compute_test_results.py
-```
-
-### 2.6. Evaluate The Retrieval Performance
-The retrieval performance of the model is evaluted. 
-```
-    python compute_retrieval_performance.py
-```
+The embeddings are stored in folder .\embeddings\\<test/train>
 
 ## 3. Model Performance
-### 3.1. 500 Test Images
 
-| Metric                            |  Value  | 
-| --------------------------------- | ------- | 
-| Retrieval Time (without overhead) | 0.46s   |
-| Retrieval Time (with overhead)    | 2.45s   | 
-| mAP@5                             | 48.96%  |
-| mAP@10                            | 48.42%  |
-| mAP@15                            | 48.75%  |
-| mAP@20                            | 48.64%  |
-| mAHP@5                            | 64.27%  |
-| mAHP@10                           | 63.93%  |
-| mAHP@15                           | 64.03%  |
-| mAHP@20                           | 63.95%  |
+### 3.1. All Test Images
 
-### 3.2. All Test Images
+|Method               | Inference time | Retrieval time | mAP@1 | mAP@5 | mAP@100 | map@250 | mAHP@1 | mAHP@5 | mAHP@100 | mAHP@250 |
+|---------------------| ---------------|----------------| ------|-------|---------|---------|--------|--------|----------|----------|
+|Algo 2               |         | 0.46s          |       |       |         |         |        |        |          |          |
+|Algo 2 + hashes      |                | 2.45s          |       |       |         |         |        |        |          |          |  
 
-| Metric                            |  Value  | 
-| --------------------------------- | ------- | 
-| Retrieval Time (without overhead) | 0.51s   |
-| Retrieval Time (with overhead)    | 2.67s   | 
-| mAP@5                             | 49.14%  |
-| mAP@10                            | 49.10%  |
-| mAP@15                            | 48.77%  |
-| mAP@20                            | 48.49%  |
-| mAHP@5                            | 65.07%  |
-| mAHP@10                           | 65.12%  |
-| mAHP@15                           | 64.83%  |
-| mAHP@20                           | 64.50%  |
+[1]:https://www.cs.toronto.edu/~kriz/cifar.html  
 
-[1]: https://enricopal.github.io/publications/Semantic%20Similarity%20between%20Images.pdf
-[2]: http://w3.usf.edu/FreeAssociation/
+[2]:https://drive.google.com/drive/folders/1E7P3qUCizB3ENI4y-cQul9xO3CWetgFI?usp=sharing
