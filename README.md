@@ -59,7 +59,7 @@ Before running any scripts ensure that you have the required dependencies. To in
 To finetune the model, use:
 
 ```
-make finetune
+    make finetune
 ```
 
 
