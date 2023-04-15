@@ -331,8 +331,8 @@ if __name__ == '__main__':
                 plt.ylabel('Performance Metric Value')
                 plt.legend()
                 plt.show()
-                plt.savefig('plot.png')
-                # plt.clf()
+                plt.savefig('reports/plot.png')
+                plt.clf()
 
             
             cnt += 1

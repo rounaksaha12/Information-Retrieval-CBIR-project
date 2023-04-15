@@ -36,7 +36,7 @@ For computing the test results for all 10000 test images in the CIFAR-100 datase
     --dataset <test/train >
 ```
 
-The dataset argument can be used to specify whether to retrieve from **test/train** images of the **CIFAR-100** dataset. The results include the performance metrics obtained and the predictions of *top k* images along with similarity scores both by **Algorithm 2** and **Algorithm 2 +  hashes**. A graph named 'plot.png' is created displaying variation of mAP and mAHP versus k.
+The dataset argument can be used to specify whether to retrieve from **test/train** images of the **CIFAR-100** dataset. The results include the performance metrics obtained and the predictions of *top k* images along with similarity scores both by **Algorithm 2** and **Algorithm 2 +  hashes**. A graph named 'plot.png' is created in the reports folder displaying variation of mAP and mAHP versus k.
 
 ### 1.2. Interactive Demo
 
