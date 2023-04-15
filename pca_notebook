@@ -5,3 +5,6 @@ https://colab.research.google.com/drive/1cR_EfR_VEgiUoeulkM3yWxcTT0fGOjO-?usp=sh
 Instructions:
 1. Run the first cell to download required files
 2. Run the second cell to obtain results after dimensionality reduction using PCA
+
+You can change the value of topk to any number of images as desired.
+The type can be changed to 'test' or 'train' as desired.
