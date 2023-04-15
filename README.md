@@ -56,6 +56,12 @@ Before running any scripts ensure that you have the required dependencies. To in
 
 ### 2.1. Train Model
 
+To finetune the model, use:
+
+```
+make finetune
+```
+
 
 ### 2.2. Compute Image Embeddings
 
@@ -73,8 +79,8 @@ The embeddings are stored in folder .\embeddings\\<test/train>
 
 |Method               | Inference time | Retrieval time | mAP@1 | mAP@5 | mAP@100 | map@250 | mAHP@1 | mAHP@5 | mAHP@100 | mAHP@250 |
 |---------------------| ---------------|----------------| ------|-------|---------|---------|--------|--------|----------|----------|
-|Algo 2               |         | 0.46s          |       |       |         |         |        |        |          |          |
-|Algo 2 + hashes      |                | 2.45s          |       |       |         |         |        |        |          |          |  
+|Algo 2               | 0.22s        | 4.67ms          | 1.0      | 0.5646      | 0.2664        | 0.1321        | 1.0       | 0.8865       | 0.7916         | 0.7942         |
+|Algo 2 + hashes      | 0.22s               | 4.48ms          | 1.0      | 0.5617      | 0.2559        | 0.1236        | 1.0       | 0.8865       | 0.7838         | 0.7786         |  
 
 [1]:https://www.cs.toronto.edu/~kriz/cifar.html  
 

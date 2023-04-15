@@ -233,26 +233,26 @@ if __name__ == '__main__':
 		exit()
 
 	print('saving id2imgs')
-	with open(f'{id2imgs_dump}_{dataset}.pickle','wb') as fp:
+	with open(f'./embeddings/train/{id2imgs_dump}_{dataset}.pickle','wb') as fp:
 		pickle.dump(id2imgs, fp)
 	
 	print('saving 4096-d embeddings')
-	with open(f'{embedding_4096_dump}_{dataset}.pickle','wb') as fp:
+	with open(f'./embeddings/train/{embedding_4096_dump}_{dataset}.pickle','wb') as fp:
 		pickle.dump(embeds_4096, fp)
 
 	print('saving 100-d embeddings')
-	with open(f'{embedding_100_dump}_{dataset}.pickle','wb') as fp:
+	with open(f'./embeddings/train/{embedding_100_dump}_{dataset}.pickle','wb') as fp:
 		pickle.dump(embeds_100, fp)
 	
 	print('saving hashes')
-	with open(f'{hash_dump}_{dataset}.pickle','wb') as fp:
+	with open(f'./embeddings/train/{hash_dump}_{dataset}.pickle','wb') as fp:
 		pickle.dump(hashes, fp)
 
 	model_ft.train()
 
 	if save_model:
 		temp = 'finetune' if args.finetune else 'ft'
-		PATH = f'./{dataset}-alexnet-{temp}'
+		PATH = f'./models/{dataset}-alexnet-{temp}'
 		torch.save(model_ft.state_dict(),PATH)
 
 	print()
