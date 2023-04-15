@@ -1,0 +1,7 @@
+Link to Colab notebook for PCA dimensionality reduction code:
+
+https://colab.research.google.com/drive/1cR_EfR_VEgiUoeulkM3yWxcTT0fGOjO-?usp=sharing
+
+Instructions:
+1. Run the first cell to download required files
+2. Run the second cell to obtain results after dimensionality reduction using PCA
