@@ -131,8 +131,8 @@ if __name__ == '__main__':
                 transform=data_transform
             )}
 
-        # construct a class similar 2-d matrix of size 100*100 where i,j the entry
-        # contains the similarity of ith and jth class
+        
+        
         class_sim_matrix = np.zeros((100, 100))
         for i in range(100):
             for j in range(100):
@@ -141,10 +141,10 @@ if __name__ == '__main__':
                 class_sim_matrix[i][j] = cosine_similarity(
                     x.reshape(1, -1), y.reshape(1, -1))
 
-        # sort each row of list in place
+        
         class_sim_matrix = np.sort(
             class_sim_matrix, axis=1, kind='mergesort')[:, ::-1]
-        # print(class_sim_matrix)
+        
 
         cnt = 0
         for img, label in image_datasets["test"]:
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             hash = torch.where(hash >= 0.5, torch.ones_like(
                 hash), torch.zeros_like(hash))
 
-            # F.normalize(hash, dim=0, out=hash)
+            
             F.normalize(embed_100, dim=0, out=embed_100)
             F.normalize(embed_4096, dim=0, out=embed_4096)
             end = time.process_time()
@@ -324,30 +324,40 @@ if __name__ == '__main__':
                 x = np.array([1, 5, 10, 15, 20, 25, 50, 100, 150, 200, topk])
                 y1 = np.array([mhp1_1/(cnt+1), mhp1_5/(cnt+1), mhp1_10/(cnt+1), mhp1_15/(cnt+1), mhp1_20/(cnt+1), mhp1_25/(cnt+1), mhp1_50/(cnt+1), mhp1_100/(cnt+1), mhp1_150/(cnt+1), mhp1_200/(cnt+1), mhp1_k/(cnt+1)])
                 y2 = np.array([map1_1/(cnt+1), map1_5/(cnt+1), map1_10/(cnt+1), map1_15/(cnt+1), map1_20/(cnt+1), map1_25/(cnt+1), map1_50/(cnt+1), map1_100/(cnt+1), map1_150/(cnt+1), map1_200/(cnt+1), map1_k/(cnt+1)])
-                fig, axs = plt.subplots(nrows=1, ncols=2)
-
-                axs[0].plot(x, y1, color='red', linestyle='--', label='My line')
-                axs[0].legend()
-                axs[0].set_xlabel('X Label')
-                axs[0].set_ylabel('Y Label 1')
-                axs[0].set_title('Graph 1')
-                axs[0].legend()
-                # axs[0].set_xlim(0, 6)
-                # axs[0].set_ylim(0, 12)
-
-                axs[1].plot(x, y2, color='blue', linestyle=':', label='My other line')
-                axs[1].legend()
-                axs[1].set_xlabel('X Label')
-                axs[1].set_ylabel('Y Label 2')
-                axs[1].set_title('Graph 2')
-                axs[1].legend()
-                # axs[0].set_xlim(8, 15)
-                # axs[0].set_ylim(0, 12)
                 
-                plt.show(block = True)
+                plt.plot(x,y1,color = 'blue', label = 'MHAP')
+                plt.plot(x,y2,color = 'red', label = 'MAP')
+                plt.xlabel('Value of top K')
+                plt.ylabel('Precision')
+                plt.legend()
+                plt.show()
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                plt.savefig('plot.png')
+                plt.clf()
 
             
             cnt += 1
 
-        # plot graphs on pyplot and numpy
+        
         

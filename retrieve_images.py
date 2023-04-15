@@ -38,31 +38,29 @@ def retrieve_images(embed_100, embed_4096, hash, img_dataset_embed_100, img_data
             print(
                 f"Similarity:{embed_100_pdt[top1k_indices[i]]} Label:{ds_label['fine_label_names'][img_dataset_labels[top1k_indices[i]]]}")
 
-        mask = torch.zeros_like(img_dataset_embed_100)
 
         start_hash = time.process_time()
 
         _, top2k_indices = torch.topk(-torch.cdist(img_dataset_hashes,
                                       torch.unsqueeze(hash, 0), p=0).flatten(), k=topk)
-
-        mask[top2k_indices, :] = torch.ones(
-            (len(top2k_indices), mask.shape[1]))
-
-        new_img_dataset_embed_100 = img_dataset_embed_100*mask
+                
+        mask = img_dataset_embed_100[top2k_indices.tolist()]
 
         img_hash_embeds_pdt = torch.matmul(
-            new_img_dataset_embed_100, embed_100)
+            mask, embed_100)
 
         _, top3k_indices = torch.topk(img_hash_embeds_pdt.flatten(), k=topk)
 
         end_hash = time.process_time()
         similarity_time_2 = (end_hash - start_hash)
+        
 
         embed_hash_pdt = torch.cdist(
             img_dataset_hashes, torch.unsqueeze(hash, 0), p=0)
 
         print(
             f'Time to compute similarity between hash embeddings of all and 100-d embeddings of the top {2*topk} images : {end_hash - start_hash}')
+        
 
         print(
             "\nTop similar images based on hash embeddings [least hamming distance at top]")
@@ -72,10 +70,12 @@ def retrieve_images(embed_100, embed_4096, hash, img_dataset_embed_100, img_data
 
         print("\nTop similar images based on 100-d embeddings and hash embeddings")
         for i in range(topk):
+            
             print(
-                f"Similarity:{img_hash_embeds_pdt[top3k_indices[i]]} Label:{ds_label['fine_label_names'][img_dataset_labels[top3k_indices[i]]]}")
+                f"Similarity:{img_hash_embeds_pdt[top3k_indices[i].item()]} Label:{ds_label['fine_label_names'][img_dataset_labels[top2k_indices[top3k_indices[i].item()].item()]]}")
 
         img_dataset_labels_1 = [img_dataset_labels[i] for i in top1k_indices]
-        img_dataset_labels_2 = [img_dataset_labels[i] for i in top3k_indices]
+        img_dataset_labels_2 = [img_dataset_labels[top2k_indices[i].item()] for i in top3k_indices]
+        
 
     return img_dataset_labels_1, img_dataset_labels_2, similarity_time_1, similarity_time_2
