@@ -10,6 +10,8 @@ The details of both the algorithms are described in the **Report**.
 
 The training and testing was carried out using the [**The CIFAR-100 dataset**][1] :
 
+You can view the log files from the **log_files** folder [**here**][2]:
+
 ## 0. Setup
 
 After cloning this repository,create **embeddings** and **models** folder, download the **embeddings** and **models** folder from [**here**][2], and extract their contents into the **embeddings** and **models** folder in the directory respectively.
@@ -35,14 +37,19 @@ For computing the test results for all 10000 test images in the CIFAR-100 datase
 ```
 
 The dataset argument can be used to specify whether to retrieve from **test/train** images of the **CIFAR-100** dataset. The results include the performance metrics obtained and the predictions of *top k* images along with similarity scores both by **Algorithm 2** and **Algorithm 2 +  hashes**. A graph named 'plot.png' is created displaying variation of mAP and mAHP versus k.
-<!-- 
+
 ### 1.2. Interactive Demo
 
 For an interactive demo, use:
 
 ```python
-    python interface.py
-``` -->
+    python interface.py \
+    --dataset <test/train > \
+    --option <1/2>        
+
+```
+
+Value of option 1 retrieves images using **Algorithm 2** and option 2 retrieves images using **Algorithm 2 + hashes**. The dataset argument can be used to specify whether to retrieve from **test/train** images of the **CIFAR-100** dataset.  
 
 ## 2. Longrun
 
@@ -58,10 +65,9 @@ Before running any scripts ensure that you have the required dependencies. To in
 
 To finetune the model, use:
 
-```
+```makefile
     make finetune
 ```
-
 
 ### 2.2. Compute Image Embeddings
 

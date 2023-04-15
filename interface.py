@@ -21,19 +21,51 @@ from PIL import Image
 
 if __name__ == '__main__':
     with torch.no_grad():
+        with open('data/cifar-100-python/meta', 'rb') as f:
+            ds_label = pickle.load(f)
         parser = argparse.ArgumentParser()
         parser.add_argument('--k', default=20, type=int,
                             help='Number of top similar images to retrieve')
         parser.add_argument('--dataset', default='train', type=str,
                             help="If 'train',retrieves images from training set of CIFAR-100 ,else if 'test' testing set of CIFAR-100")
+        parser.add_argument('--option', default=2, type=int,
+                            help='1 for retrieving by Algo 2 and 2 for retrieving by Algo 2 + hashes')
         args = parser.parse_args()
 
         topk = args.k
         type = args.dataset
-        image_path = input("Enter the path to the image file: ")
-        image = Image.open(image_path)
-        label = input("Enter the label for the image: ")
-        
+        method = args.option
+        idx = input(
+            "Enter the index of image from the test set of CIFAR-100 to retrieve images: ")
+
+        idx = int(idx)
+        model, input_size = modelNew.initialize_alexnet(0, 100, 48)
+        model.load_state_dict(torch.load(
+            'models/CIFAR-100-alexnet-finetune.zip', map_location=torch.device('cpu')))
+        model.eval()
+
+        data_transform = transforms.Compose([
+            transforms.Resize(input_size),
+            transforms.CenterCrop(input_size),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.486, 0.486], [0.229, 0.224, 0.225])])
+
+        image_datasets = {
+            'train': datasets.CIFAR100(
+                root='./data',
+                train=True,
+                download=True,
+                transform=data_transform
+            ),
+            'test': datasets.CIFAR100(
+                root='./data',
+                train=False,
+                download=True,
+                transform=data_transform
+            )}
+
+        inp_img, inp_label = image_datasets["test"][idx]
+
         if type == 'train':
             with open('embeddings/train/id2imgs_CIFAR-100.pickle', 'rb') as f:
                 img_dataset_lables = pickle.load(f)
@@ -91,76 +123,69 @@ if __name__ == '__main__':
             F.normalize(img_dataset_embed_4096, p=2,
                         dim=1, out=img_dataset_embed_4096)
 
-        with open('data/cifar-100-python/meta', 'rb') as f:
-            ds_label = pickle.load(f)
-
         with open('embeddings/cifar100.unitsphere.pickle', 'rb') as f:
             class_embeds = pickle.load(f)
 
-        model, input_size = modelNew.initialize_alexnet(0, 100, 48)
-        model.load_state_dict(torch.load(
-            'models/CIFAR-100-alexnet-finetune.zip', map_location=torch.device('cpu')))
-        model.eval()
-
-        data_transform = transforms.Compose([
-            transforms.Resize(input_size),
-            transforms.CenterCrop(input_size),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.486, 0.486], [0.229, 0.224, 0.225])])
-        
-        
-        img_new = data_transform(image)
         start = time.process_time()
-        img_new = torch.unsqueeze(img_new, 0)
+        img_new = torch.unsqueeze(inp_img, 0)
         embed_4096, hash, embed_100 = model(img_new)
         hash = torch.squeeze(hash)
         embed_100 = torch.squeeze(embed_100)
         embed_4096 = torch.squeeze(embed_4096)
         hash = torch.where(hash >= 0.5, torch.ones_like(
-			hash), torch.zeros_like(hash))
+            hash), torch.zeros_like(hash))
 
-		
         F.normalize(embed_100, dim=0, out=embed_100)
         F.normalize(embed_4096, dim=0, out=embed_4096)
         end = time.process_time()
         print(f'\nModel inference and pre-process time : {end-start}')
-        retrieved_labels_1, retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
-			    embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label, label, topk)
-		
-		# display retrieved images
-        image_datasets = {
-        'train': datasets.CIFAR100(  
-        root='./data',
-        train=True,
-        download=True,
-        transform=data_transform
-        ),
-        'test': datasets.CIFAR100(
-            root='./data',
-            train=False,
-            download=True,
-            transform=data_transform
-        )}
-        
-        # img, label = image_datasets[type][]:
-        # load the image at the indexes in retrieved labels 1 and display in matplotlib
-        # Assuming you have 20 images in the form of numpy arrays, each with shape (height, width, channels)
-        images = []
-        
-        print(image_datasets[type][retrieved_labels_1[0]])
+        idx1, idx2, retrieved_labels_1, retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
+            embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label, inp_label, topk)
 
-        # Add your 20 images to the `images` list
+        dataset = {
+            'train': datasets.CIFAR100(
+                root='./data',
+                train=True,
+                download=True
+            ),
+            'test': datasets.CIFAR100(
+                root='./data',
+                train=False,
+                download=True
+            )}
 
-        # Combine the 20 images into a single numpy array with shape (20, height, width, channels)
-        images_array = np.array(images)
+        images_array = []
+        retrieved_labels = []
+        if method == 2:
+            for index in idx2:
+                images, labels = dataset[type][index]
+                images_array.append(images)
+                retrieved_labels.append(labels)
+        elif method == 1:
+            for index in idx2:
+                images, labels = dataset[type][index]
+                images_array.append(images)
+                retrieved_labels.append(labels)
+                
+        # first display the input
+        inp_img, inp_label = dataset["test"][idx]
+        fig, axs = plt.subplots(nrows=3, ncols=7, figsize=(12, 8))
 
-        # Reshape the array to (4, 5, height, width, channels), where 4 and 5 are the number of rows and columns
-        images_array = images_array.reshape(4, 5, *images_array.shape[1:])
+        cnt = 0
+        for i, ax in enumerate(axs.flatten()):
+            if i ==0:
+               ax.imshow(inp_img)
+               label = ds_label['fine_label_names'][inp_label]
+               ax.set_title(f'Query: {label}')
+               continue
+            ax.imshow(images_array[cnt])
+            label = ds_label['fine_label_names'][retrieved_labels[cnt]]
+            ax.set_title(f'{label}')
+            ax.axis('off')
+            cnt +=1
+            if cnt >= 20:
+                break
 
-        # Combine the images in each row and column using np.concatenate
-        rows = [np.concatenate(images_array[i], axis=1) for i in range(images_array.shape[0])]
-        combined_images = np.concatenate(rows, axis=0)
-
-        # Display the combined images using plt.imshow
-        plt.imshow(combined_images)
         plt.show()
+
+        plt.savefig('results.png')

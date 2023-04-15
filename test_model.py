@@ -164,7 +164,7 @@ if __name__ == '__main__':
 
             print(f'\nModel inference and pre-process time : {end-start}')
             avg_inference_time += (end-start)
-            retrieved_labels_1, retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
+            _,_,retrieved_labels_1, retrieved_labels_2, similarity_time_1, similarity_time_2 = retrieve_images(
                  embed_100, embed_4096, hash, img_dataset_embed_100, img_dataset_embed_4096, img_dataset_hashes, img_dataset_labels, ds_label, label, topk)
 
             p1_array, hp1_array, bal_acc_1 = evaluate_retrieval(
@@ -289,9 +289,9 @@ if __name__ == '__main__':
                 print(
                     f"\nMean Average hierarchical precision@{topk} of top {topk} images using method 1 : {mhp1_k/(cnt+1)}")
                 print(
-                    f"\nMean Average hierarchical precision@1 of top {topk} images using method 1 : {mhp1_1/(cnt+1)}")
+                    f"\nMean Average hierarchical precision@1 of top {topk} images using method 2 : {mhp2_1/(cnt+1)}")
                 print(
-                    f"\nMean Average hierarchical precision@5 of top {topk} images using method 1 : {mhp1_5/(cnt+1)}")
+                    f"\nMean Average hierarchical precision@5 of top {topk} images using method 2 : {mhp2_5/(cnt+1)}")
                 print(
                     f"\nMean Average hierarchical precision@10 of top {topk} images using method 2 : {mhp2_10/(cnt+1)}")
                 print(
@@ -328,33 +328,11 @@ if __name__ == '__main__':
                 plt.plot(x,y1,color = 'blue', label = 'MHAP')
                 plt.plot(x,y2,color = 'red', label = 'MAP')
                 plt.xlabel('Value of top K')
-                plt.ylabel('Precision')
+                plt.ylabel('Performance Metric Value')
                 plt.legend()
                 plt.show()
-                
-                
-
-                
-                
-                
-                
-                
-                
-                
-                
-
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
                 plt.savefig('plot.png')
-                plt.clf()
+                # plt.clf()
 
             
             cnt += 1

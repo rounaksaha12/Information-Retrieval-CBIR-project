@@ -76,6 +76,8 @@ def retrieve_images(embed_100, embed_4096, hash, img_dataset_embed_100, img_data
 
         img_dataset_labels_1 = [img_dataset_labels[i] for i in top1k_indices]
         img_dataset_labels_2 = [img_dataset_labels[top2k_indices[i].item()] for i in top3k_indices]
+        idx_1 = [i for i in top1k_indices]
+        idx_2 = [top2k_indices[i].item() for i in top3k_indices]
         
 
-    return img_dataset_labels_1, img_dataset_labels_2, similarity_time_1, similarity_time_2
+    return idx_1,idx_2,img_dataset_labels_1, img_dataset_labels_2, similarity_time_1, similarity_time_2
