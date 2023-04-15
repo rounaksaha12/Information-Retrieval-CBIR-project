@@ -88,6 +88,12 @@ The embeddings are stored in folder .\embeddings\\<test/train>
 |Algo 2               | 0.22s        | 4.67ms          | 1.0      | 0.5646      | 0.2664        | 0.1321        | 1.0       | 0.8865       | 0.7916         | 0.7942         |
 |Algo 2 + hashes      | 0.22s               | 4.48ms          | 1.0      | 0.5617      | 0.2559        | 0.1236        | 1.0       | 0.8865       | 0.7838         | 0.7786         |  
 
+## Further Approaches
+
+### Applying dimensionality reduction using PCA 
+
+Open the file named pca_notebook and follow instructions provided to obtain results using PCA.
+
 [1]:https://www.cs.toronto.edu/~kriz/cifar.html  
 
 [2]:https://drive.google.com/drive/folders/1E7P3qUCizB3ENI4y-cQul9xO3CWetgFI?usp=sharing
